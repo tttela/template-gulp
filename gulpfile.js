@@ -5,7 +5,7 @@ const cleanCSS = require('gulp-clean-css');
 const cmq = require('gulp-combine-media-queries');
 
 const paths = {
-  'url': 'http://seijouriha.lo',
+  'url': '',
   'dest': {
     'css': './css/',
   },
