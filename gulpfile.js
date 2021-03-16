@@ -3,7 +3,6 @@ const $ = require('gulp-load-plugins')()
 const sync = require('browser-sync').create()
 const imgminJpg = require('imagemin-jpeg-recompress');
 const imgminPng = require('imagemin-pngquant');
-const cssnano = require('cssnano');
 const autoprefixer = require('autoprefixer');
 const mqpacker = require("css-mqpacker");
 const sorter = require('css-declaration-sorter');
@@ -23,46 +22,45 @@ const paths = {
     'jsPlugins': './assets/js/plugins/*.js',
   }
 }
+
 //server
-gulp.task('server', done => {
+function server(done) {
   console.log('---------- server task ----------')
   sync.init({
-    proxy: paths.url + "/"
+    server: {
+      baseDir: "./"
+    }
   })
   done();
-})
+}
+
 
 //sass
-gulp.task('sass', done => {
+function sass() {
   console.log('---------- sass task ----------')
   const plugin = [
     autoprefixer(),
     sorter({
       order: 'smacss'
     }),
-    mqpacker(),
-    cssnano({
-      autoprefixer: false
-    })
+    mqpacker()
   ]
-  gulp.src([paths.src.cssPlugins, paths.src.css])
+  return gulp
+    .src([paths.src.cssPlugins, paths.src.css])
     .pipe($.plumber())
     .pipe($.sass({
       outputStyle: 'expanded',
     }).on('error', $.sass.logError))
     .pipe($.concat('style.css'))
     .pipe($.postcss(plugin))
-    .pipe($.rename({
-      suffix: '.min',
-    }))
     .pipe(gulp.dest(paths.dest.css));
-  done();
-})
+}
 
 //img
-gulp.task('img', done => {
+function img() {
   console.log('---------- img task ----------')
-  gulp.src(paths.src.img)
+  return gulp
+    .src(paths.src.img)
     .pipe($.changed(paths.dest.img))
     .pipe($.imagemin([
       imgminPng(),
@@ -76,33 +74,31 @@ gulp.task('img', done => {
     }))
     .pipe($.imagemin())
     .pipe(gulp.dest(paths.dest.img))
-  done();
-})
+}
 
 //js
-gulp.task('js', done => {
+function js() {
   console.log('---------- js task ----------')
-  gulp.src([paths.src.jsPlugins, paths.src.js])
+  return gulp
+    .src([paths.src.jsPlugins, paths.src.js])
     .pipe($.plumber())
-    .pipe($.concat('app.min.js'))
+    .pipe($.concat('app.js'))
     .pipe($.uglify())
     .pipe(gulp.dest(paths.dest.js))
-  done();
-})
+}
 
 
 // watch
-gulp.task('watch', done => {
+function watch() {
   console.log('---------- watch task ----------')
   const reload = done => {
     sync.reload()
     done()
   }
-  gulp.watch('./**/*', reload)
-  gulp.watch([paths.src.cssPlugins, paths.src.css], gulp.series('sass'))
-  gulp.watch(paths.src.img, gulp.series('img'))
-  gulp.watch([paths.src.jsPlugins, paths.src.js], gulp.series('js'))
-  done()
-})
+  gulp.watch('./**/*').on('change', gulp.series(reload))
+  gulp.watch([paths.src.cssPlugins, paths.src.css]).on('change', gulp.series(sass))
+  gulp.watch(paths.src.img).on('change', gulp.series(img))
+  gulp.watch([paths.src.jsPlugins, paths.src.js]).on('change', gulp.series(js))
+}
 
-gulp.task('default', gulp.series('server', 'watch'))
+gulp.task('default', gulp.series(gulp.parallel(sass, img, js), gulp.series(server, watch)));

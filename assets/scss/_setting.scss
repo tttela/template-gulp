@@ -1,0 +1,143 @@
+/* Val---------------------------------------------- */
+
+$ff: "UD Shin Go Regular", "Lucida Grande", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3", Meiryo, メイリオ, sans-serif;
+
+$base: #333;
+
+$w-s: 480;
+$w-m: 768;
+$w-l: 1000;
+$w-xl: 1280;
+
+
+$breakpoints: (
+  's': 'screen and (max-width:'+ $w-s +'px)',
+  'm': 'screen and (max-width:'+ $w-m +'px)',
+  'l': 'screen and (max-width:'+ $w-l +'px)',
+  'xl': 'screen and (max-width:'+ $w-xl +'px)',
+) !default;
+
+@mixin mq($breakpoint: md) {
+  @media #{map-get($breakpoints, $breakpoint)} {
+    @content;
+  }
+}
+// 例
+// @include mq(l) { // 引数を個別に指定
+//     color: red;
+//   }
+
+
+
+/* Common---------------------------------------------- */
+body{
+  font-family: $ff;
+  font-size: 14px;
+  // font-feature-settings: "palt";
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  color: $base;
+  @include mq(xl) {
+    color: initial;
+  }
+  @include mq(l) {
+    color: initial;
+  }
+  @include mq(m) {
+    font-size: to-vw(13,375);
+  }
+  @include mq(s) {
+  }
+}
+a{
+  text-decoration: none;
+  color: $base;
+  &:hover{
+    opacity: .8;
+  }
+}
+img{
+  max-width: 100%;
+}
+li{
+  list-style: none;
+}
+h1,h2,h3,h4,h5{
+  font-weight: normal;
+}
+input[type="submit"],
+input[type="button"] {
+  appearance: button;
+  border: none;
+  box-sizing: border-box;
+    &::-webkit-search-decoration {
+      display: none;
+    }
+    &::focus {
+      outline-offset: -2px;
+    }
+}
+input[type="text"],input[type="email"],select,textarea{
+  padding:.1em .3em;
+  font-size: 15px;
+  max-width: 350px;
+  width: 100%;
+  @include mq(m){
+    font-size: 16px;
+    // transform: scale(0.9);
+  }
+}
+select{
+  font-family: system-ui;
+}
+textarea{
+  @include mq(m){
+    min-height: 30vw;
+    width: 100%;
+  }
+}
+.icon{
+  font-size: 20px;
+}
+.is{
+  &-pc{
+    @include mq(m) {
+      display: none;
+    }
+  }
+  &-sp{
+    display: none;
+    @include mq(m) {
+      display: block;
+    }
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+%inner{
+  width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin: 0 auto;
+  @include mq(l) {
+    width: 98%;
+  }
+}
+.inner{
+  max-width: 980px;
+  @extend %inner;
+  &-wide{
+    max-width: 1200px;
+    @extend %inner;
+  }
+  &-narrow{
+    max-width: 800px;
+    @extend %inner;
+  }
+}

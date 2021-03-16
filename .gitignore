@@ -3,5 +3,6 @@ package-lock.json
 
 css/*
 img/*
+js/*
 !.gitkeep
 !css/fonts
